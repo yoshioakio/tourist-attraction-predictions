@@ -238,13 +238,11 @@ Langkah awal adalah memastikan dataset yang digunakan telah bersih dan terstrukt
 
 Dari data ini terlihat bahwa fitur category akan menjadi dasar dari proses rekomendasi berbasis konten.
 
-#### 2. Modeling
-
-##### Content-Based Filtering
+#### 2. Modeling Content-Based Filtering
 
 Pada tahap ini, dilakukan pemodelan sistem rekomendasi menggunakan pendekatan Content-Based Filtering, yaitu dengan merekomendasikan item yang memiliki kemiripan konten (kategori) dengan item yang dipilih oleh pengguna.
 
-###### 🔧 a. TF-IDF Vectorization
+##### 🔧 a. TF-IDF Vectorization
 
 Digunakan TfidfVectorizer dari scikit-learn untuk mengubah teks kategori menjadi vektor numerik.
 
@@ -271,7 +269,7 @@ Representasi hasil TF-IDF dapat divisualisasikan sebagai DataFrame (contoh penga
 
 (Catatan: Matriks penuh tidak ditampilkan karena kompleks dan besar. Ini hanya ilustrasi representatif.)
 
-###### 🤝 b. Cosine Similarity
+##### 🤝 b. Cosine Similarity
 
 Setelah mendapatkan representasi vektor, langkah selanjutnya adalah menghitung tingkat kemiripan antar wisata menggunakan Cosine Similarity.
 
@@ -283,16 +281,16 @@ Setelah mendapatkan representasi vektor, langkah selanjutnya adalah menghitung t
 - Ukuran matriks kemiripan: (437, 437)
 - Nilai 1 menunjukkan wisata yang berada pada kategori yang sama.
 
-###### 📌 c. Alasan Menggunakan TF-IDF + Cosine Similarity
+##### 📌 c. Alasan Menggunakan TF-IDF + Cosine Similarity
 
 - TF-IDF digunakan karena mampu menangkap term significance dalam data kategori pendek.
 - Cosine Similarity efektif mengukur kemiripan antara vektor fitur tanpa terpengaruh oleh panjang teks.
 
-##### 3. Implementasi Model Rekomendasi
+#### 3. Implementasi Model Rekomendasi
 
 🔍 Cara Kerja Singkat
 
-###### 🧾 1. Input: Nama Tempat Wisata
+##### 🧾 1. Input: Nama Tempat Wisata
 
 Pengguna cukup memasukkan nama tempat wisata yang pernah dikunjungi. Nama ini akan digunakan sebagai query utama untuk mencari tempat-tempat serupa.
 
@@ -301,11 +299,11 @@ Pengguna cukup memasukkan nama tempat wisata yang pernah dikunjungi. Nama ini ak
             print(f"Tempat wisata dengan nama '{place_name}' tidak ditemukan.")
             return pd.DataFrame()
 
-###### ⚙️ 2. Proses: Mencari Kemiripan dan Evaluasi
+##### ⚙️ 2. Proses: Mencari Kemiripan dan Evaluasi
 
 - Hitung kemiripan antara tempat input dan semua tempat lain menggunakan Cosine Similarity.
 - Lalu ambil sejumlah top_k tempat paling mirip (kecuali tempat input).
-- Evaluasi kesamaan kategori (optional metric: Precision@K).
+- Evaluasi kesamaan kategori
 
         sim_scores = list(enumerate(similarity_data.iloc[place_index[0]]))
         sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:top_k + 1]
@@ -328,13 +326,11 @@ Pengguna cukup memasukkan nama tempat wisata yang pernah dikunjungi. Nama ini ak
 
         precision_at_k = total_overlap / sum(category_counts) if category_counts else 0
 
-###### 📤 3. Output: Daftar Rekomendasi Tempat Wisata
+##### 📤 3. Output: Daftar Rekomendasi Tempat Wisata
 
 Output berupa tabel rekomendasi tempat wisata yang relevan dengan tempat yang dimasukkan sebelumnya. Setiap hasil mencakup nama tempat dan kategorinya.
 
-        display(recommendations[['tour_name', 'category']])
-
-**Contoh Output**
+**Contoh Penenrapan dan pengunaan**
 
         tour_recommendation("Rabbit Town")
 
@@ -351,4 +347,81 @@ Rekomendasi Tempat Wisata Lainnya 5:
 | Ocean Ecopark                     | Taman Hiburan |
 | Kidzania                          | Taman Hiburan |
 
-##### Collaborative Filtering
+### Collaborative Filtering
+
+Collaborative Filtering memanfaatkan interaksi pengguna (review/rating) terhadap tempat wisata untuk memberikan rekomendasi yang personal. Sistem ini dirancang untuk menangkap pola preferensi pengguna dan menyarankan tempat baru berdasarkan user-user serupa.
+
+#### 📦 1. Data Loading
+
+Langkah awal adalah memuat dataset Reviews_df, yaitu kumpulan ulasan pengguna terhadap berbagai tempat wisata. Data ini berisi User_Id, Place_Id, dan Place_Ratings.
+
+        user = Reviews_df
+        user
+
+| User_Id | Place_Id | Place_Ratings |
+| ------- | -------- | ------------- |
+| 1       | 179      | 3             |
+| 1       | 344      | 2             |
+| 1       | 5        | 5             |
+| ...     | ...      | ...           |
+
+#### 🧹 2. Data Preparation
+
+Tahap ini bertujuan untuk mempersiapkan data agar bisa digunakan dalam model, terutama melakukan encoding (mengubah ID ke bentuk numerik).
+
+Langkah-langkah:
+
+1. Ambil daftar unik User_Id & Place_Id
+   -> Menghindari duplikasi dan memudahkan encoding.
+
+2. Encoding User_Id dan Place_Id
+   -> Mengubah ID asli menjadi angka unik dari 0 hingga N.
+
+3. Mapping ke DataFrame
+   -> Menambahkan kolom USER dan TOUR sebagai hasil encoding.
+
+📋 Output (Setelah Mapping):
+
+| User_Id | Place_Id | Place_Ratings | USER | TOUR |
+| ------- | -------- | ------------- | ---- | ---- |
+| 1       | 179      | 3             | 0    | 0    |
+| 1       | 344      | 2             | 0    | 1    |
+| 1       | 5        | 5             | 0    | 2    |
+| ...     | ...      | ...           | ...  | ...  |
+
+#### 🛠️ 3. Training and Validation Process
+
+Setelah data siap, langkah berikutnya adalah melatih model menggunakan data tersebut. Proses training meliputi beberapa tahap:
+
+- Split data menjadi 80% untuk training dan 20% untuk validasi untuk menjaga model tidak overfit dan dapat generalisasi dengan baik.
+- Normalisasi rating agar nilai rating berada dalam skala 0 sampai 1, memudahkan proses pembelajaran model.
+- Membentuk input x berupa pasangan (USER, TOUR) dan target y berupa rating yang sudah dinormalisasi.
+
+#### 🧠 4. Building Neural Collaborative Filtering Model
+
+Model yang digunakan adalah Neural Network sederhana dengan embedding layers untuk user dan tour (tempat wisata). Struktur inti model:
+
+- Embedding layers untuk user dan tour mengubah ID diskrit menjadi representasi vektor kontinu.
+- Bias embeddings untuk menangkap kecenderungan rating khusus user dan tempat.
+- Dot product antara embedding user dan tour sebagai prediksi dasar rating.
+- Dropout dan batch normalization untuk mencegah overfitting dan menjaga kestabilan training.
+
+Model dikompilasi dengan fungsi loss Mean Squared Error dan optimasi menggunakan Adam dengan learning rate rendah (0.0005) agar training stabil.
+
+        model.compile(
+        loss=tf.keras.losses.MeanSquaredError(),
+        optimizer = tf.keras.optimizers.Adam(learning_rate=0.0005),
+        metrics=[tf.keras.metrics.RootMeanSquaredError()]
+        )
+
+Dilakukan pelatihan dengan batch size 20 selama maksimal 50 epoch dengan early stopping (jika validasi loss tidak membaik selama 5 epoch, training dihentikan untuk mencegah overfitting).
+
+Sehingga didapati :
+
+![Epoch](image/4.png)
+
+## 🗳️5. Evaluation
+
+### Visualisasi Metrics Training
+
+![Model Metric](image/5.png)
