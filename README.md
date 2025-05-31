@@ -1,4 +1,4 @@
-# 🏝️ Sistem Rekomendasi Tempat Wisata: Content-Based & Collaborative Filtering 🏕️
+# 🏝️ Sistem Rekomendasi Tempat Wisata Content Based Filtering & Collaborative Filtering 🏕️
 
 **Author**: Muhamad Fajri Permana Haryanto  
 **Category**: Machine Learning – Recommender Systems
@@ -43,6 +43,7 @@ Melalui proyek ini, dikembangkan sistem rekomendasi destinasi wisata berbasis pe
 
 ### 🧷 Content-Based Filtering (CBF)
 
+- CBF dipilih karena data memiliki informasi tekstual yang kaya seperti deskripsi dan kategori.
 - Representasi teks: **TF-IDF vectorizer** pada fitur seperti deskripsi, kategori, lokasi.
 - Hitung kesamaan antar destinasi menggunakan **Cosine Similarity**.
 - Bangun _user profile_ dari destinasi yang pernah disukai.
@@ -50,6 +51,7 @@ Melalui proyek ini, dikembangkan sistem rekomendasi destinasi wisata berbasis pe
 
 ### 🧷 Collaborative Filtering (CF)
 
+- CF dengan SVD dipilih karena mampu mengatasi sparsity dalam matrix user-rating
 - Menggunakan algoritma **User-User** atau **Item-Item Similarity**.
 - Mengimplementasikan **Singular Value Decomposition (SVD)** untuk mengurangi _data sparsity_.
 - Prediksi rating destinasi yang belum pernah dilihat pengguna berdasarkan pola pengguna lain.
@@ -108,8 +110,16 @@ Berisi 10.000 baris dan 3 kolom.
 ### 📈 Visualisasi Awal (EDA)
 
 ![Distribusi kategori tempat wisata yang tersedia](image/1.png)
+
+Kategori wisata ‘Taman Hiburan’ paling dominan, yang menunjukkan preferensi wisatawan terhadap destinasi hiburan dan bermain.
+
 ![Distribusi jumlah daerah tempat wisata yang tersedia](image/2.png)
+
+Wilayah Kota Bandung & Yogyakarta menjadi daerah yang favorit dan ramai dikunjungi wisatawan, mungkin karena wilayah tersebut memiliki berbagai tempat wisata baik modern maupun sejarah dan natural.
+
 ![Place_Ratings](image/3.png)
+
+Distribusi rating pengguna cenderung tinggi (dominan rating 3–4), menunjukkan bias positif dalam review wisata
 
 ---
 
@@ -161,7 +171,9 @@ Diperiksa jumlah nilai kosong (missing) di kedua dataset:
 | Place_Id      | 0                   |
 | Place_Ratings | 0                   |
 
-Untuk kolom Destinations*df karena terdapat \_missing value* pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**, maka diputuskan untuk menghapus/menghilangkan kolom yang ada _missing value_ tersebut, dikarenakan kolom tersebut setelah dipertimbang kurang relavan juga dengan tujuan penelitian ini, selain itu diputuskan juga untuk menghapus beberapa kolom yang tidak relevan agar bisa lebih sesuai tujuan penelitian untuk tidak digunakan dalam analisis rekomendasi, dan penghapusan kolom ini bisa membuat model lebih optimal kedepannya.
+Untuk kolom Destinations*df karena terdapat \_missing value\* pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**, maka diputuskan untuk menghapus/menghilangkan kolom yang ada \_missing value* tersebut, karena terlalu banyak missing dan tidak bisa diimputasi secara akurat, atau tidak terlalu berdampak pada rekomendasi berbasis kategori.
+
+Selain itu diputuskan juga untuk menghapus beberapa kolom yang tidak relevan agar bisa lebih sesuai tujuan penelitian untuk tidak digunakan dalam analisis rekomendasi, dan penghapusan kolom ini bisa membuat model lebih optimal kedepannya.
 
         Destinations_df.drop(['Time_Minutes', 'Coordinate', 'Lat', 'Long', 'Unnamed: 11', 'Unnamed: 12'], axis=1, inplace=True)
 
@@ -383,20 +395,29 @@ Setelah data siap, langkah berikutnya adalah melatih model menggunakan data ters
 
 #### 🧠 4. Building Neural Collaborative Filtering Model
 
-Model yang digunakan adalah Neural Network sederhana dengan embedding layers untuk user dan tour (tempat wisata). Struktur inti model:
+Model Neural Collaborative Filtering (NCF) ini menggunakan pendekatan deep learning dengan embedding layers serta dot product untuk memprediksi rating wisata berdasarkan interaksi antara user dan tempat wisata (tour).
 
-- Embedding layers untuk user dan tour mengubah ID diskrit menjadi representasi vektor kontinu.
-- Bias embeddings untuk menangkap kecenderungan rating khusus user dan tempat.
-- Dot product antara embedding user dan tour sebagai prediksi dasar rating.
-- Dropout dan batch normalization untuk mencegah overfitting dan menjaga kestabilan training.
+Model dirancang sebagai jaringan neural sederhana dengan komponen utama sebagai berikut:
 
-Model dikompilasi dengan fungsi loss Mean Squared Error dan optimasi menggunakan Adam dengan learning rate rendah (0.0005) agar training stabil.
+- User dan Tour Embedding Layers
+  ->Mengubah ID diskrit (user_id dan tour_id) menjadi representasi vektor kontinu berdimensi tetap. Ini memungkinkan model memahami pola preferensi yang tidak eksplisit.
 
-        model.compile(
-        loss=tf.keras.losses.MeanSquaredError(),
-        optimizer = tf.keras.optimizers.Adam(learning_rate=0.0005),
-        metrics=[tf.keras.metrics.RootMeanSquaredError()]
-        )
+- Bias Embeddings
+  ->Digunakan untuk menangkap kecenderungan rating spesifik dari masing-masing user maupun tour (mirip dengan baseline bias dalam matrix factorization).
+
+- Dot Product
+  ->Representasi vektor dari user dan tour di-dot product untuk menghasilkan prediksi rating. Nilai ini mencerminkan seberapa cocok user dengan tour tertentu.
+
+- Dropout & Batch Normalization
+  -> Digunakan sebagai teknik regularisasi untuk mencegah overfitting dan menjaga kestabilan selama training.
+
+  Model dikompilasi dengan fungsi loss Mean Squared Error dan optimasi menggunakan Adam dengan learning rate rendah (0.0005) agar training stabil.
+
+          model.compile(
+          loss=tf.keras.losses.MeanSquaredError(),
+          optimizer = tf.keras.optimizers.Adam(learning_rate=0.0005),
+          metrics=[tf.keras.metrics.RootMeanSquaredError()]
+          )
 
 Dilakukan pelatihan dengan batch size 20 selama maksimal 50 epoch dengan early stopping (jika validasi loss tidak membaik selama 5 epoch, training dihentikan untuk mencegah overfitting).
 
@@ -405,6 +426,15 @@ Sehingga didapati :
 ![Epoch](image/4.png)
 
 Hasil epoch menunjukkan tren yang baik dengan penurunan nilai loss dan root_mean_squared_error (RMSE) seiring bertambahnya epoch yang mengindikasikan model belajar dengan baik. Namun, val_loss dan val_root_mean_squared_error (val_RMSE) cenderung stabil setelah epoch ke-5, bahkan sedikit meningkat di epoch terakhir, menunjukkan potensi overfitting. Secara keseluruhan, model ini menunjukkan performa yang baik pada data pelatihan, tetapi perlu diwaspadai potensi overfitting pada data validasi.
+
+### 📊 Perbandingan Pendekatan
+
+| Pendekatan              | Kelebihan                                                                  | Kekurangan                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Content-Based Filtering | - Tidak membutuhkan data interaksi pengguna baru<br>- Cepat diimplementasi | - Kurang akurat jika data kategori terbatas<br>- Tidak bisa menangkap selera pengguna pribadi |
+| Collaborative Filtering | - Menyesuaikan rekomendasi dengan preferensi unik pengguna<br>- Akurat     | - Butuh data rating/interaksi<br>- Cold start problem untuk user/item baru                    |
+
+---
 
 ## 🗳️5. Evaluation
 
