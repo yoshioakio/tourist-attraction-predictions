@@ -431,3 +431,20 @@ Daftar destinasi yang belum pernah dikunjungi pengguna kemudian diproses dan dik
         predicted_ratings = model.predict(user_place_array).flatten()
 
 Model memberikan skor prediksi terhadap setiap destinasi, lalu sistem mengurutkan hasil tersebut dan memilih 10 destinasi dengan skor tertinggi sebagai rekomendasi baru. Untuk membantu mengevaluasi relevansi, sistem juga menampilkan 5 tempat dengan rating tertinggi yang pernah dikunjungi sebelumnya oleh pengguna tersebut. Perbandingan ini bertujuan untuk melihat apakah rekomendasi yang diberikan sejalan dengan preferensi pengguna di masa lalu.
+
+## Referensi
+
+[1] S. Wang, Z. A. Bhuiyan, H. Peng, and B. Du, "Hybrid deep neural networks for friend recommendations in edge computing environment," IEEE Access, vol. 8, pp. 10693–10706, 2020.
+ResearchGate
+
+[2] N. Wayan and P. Yuni, "Designing a tourism recommendation system using a hybrid method (Collaborative filtering and content-based filtering)," in 2021 IEEE International Conference on Communication, Networks and Satellite (COMNETSAT), Purwokerto, Indonesia, 2021, pp. 298–305.
+ResearchGate
+
+[3] S. Goel and S. W. A. Rizvi, "Travel Recommendation System Using Content and Collaborative Filtering," Journal of Modern Computing and Engineering, vol. 3, no. 2, pp. 45–52, 2023.
+jmce.a2zjournals.com
+
+[4] K. E. Permana, A. B. Rahmat, D. A. Wicaksana, and D. Ardianto, "Collaborative filtering-based Madura Island tourism recommendation system using RecommenderNet," BIO Web of Conferences, vol. 65, 2024.
+bio-conferences.org
+
+[5] R. Glauber and A. Loula, "Collaborative Filtering vs. Content-Based Filtering: differences and similarities," arXiv preprint arXiv:1912.08932, 2019.
+arXiv
