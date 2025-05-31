@@ -1,0 +1,27 @@
+# 🧠 Proyek Klasifikasi Penyakit Stroke
+
+Panduan ini berisi langkah-langkah untuk menjalankan proyek klasifikasi penyakit stroke menggunakan file Jupyter Notebook (.ipynb) maupun file Python (.py).
+
+---
+
+## 📘 Menjalankan Notebook (`.ipynb`)
+
+### Langkah-langkah:
+1. Unduh file notebook: `stroke_classification.ipynb`
+2. Buka Google Colab: [https://colab.research.google.com](https://colab.research.google.com)
+3. Upload file tersebut ke Colab.
+4. Jalankan setiap sel kode satu per satu.
+
+> 💡 Cocok digunakan untuk eksplorasi dan visualisasi data interaktif.
+
+---
+
+## 🖥️ Menjalankan Script Python (`.py`) di Terminal
+
+### Langkah-langkah:
+1. Buka terminal atau command prompt.
+2. Install dependensi terlebih dahulu:
+
+```bash
+pip install kaggle
+pip install kagglehub
