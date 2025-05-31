@@ -217,11 +217,7 @@ Dictionary baru dibuat untuk menyederhanakan proses pemetaan dan pengelompokan d
 
 #### 1. Data Preparation
 
-Sebelum masuk ke tahap modeling, dilakukan beberapa tahapan data preparation untuk memastikan data siap digunakan dalam proses Content-Based Filtering.
-
-##### ✅ Langkah-Langkah Data Preparation:
-
-a. Cross-Check Variabel
+Cross-Check Variabel
 
 Langkah awal adalah memastikan dataset yang digunakan telah bersih dan terstruktur. Berikut contoh sampling data untuk pengecekan:
 
@@ -259,21 +255,9 @@ Digunakan TfidfVectorizer dari scikit-learn untuk mengubah teks kategori menjadi
 Output:
 ['alam', 'bahari', 'budaya', 'cagar', 'hiburan', 'ibadah','perbelanjaan', 'pusat', 'taman', 'tempat']
 
-Representasi hasil TF-IDF dapat divisualisasikan sebagai DataFrame (contoh pengambilan acak):
-
-        pd.DataFrame(
-            tfidf_matrix.todense(),
-            columns=tf.get_feature_names_out(),
-            index=data.tour_name
-        ).sample(10)
-
-(Catatan: Matriks penuh tidak ditampilkan karena kompleks dan besar. Ini hanya ilustrasi representatif.)
-
 ##### 🤝 b. Cosine Similarity
 
 Setelah mendapatkan representasi vektor, langkah selanjutnya adalah menghitung tingkat kemiripan antar wisata menggunakan Cosine Similarity.
-
-        from sklearn.metrics.pairwise import cosine_similarity
 
         cosine_sim = cosine_similarity(tfidf_matrix)
         cosine_sim_df = pd.DataFrame(cosine_sim, index=data['tour_name'], columns=data['tour_name'])
@@ -420,8 +404,30 @@ Sehingga didapati :
 
 ![Epoch](image/4.png)
 
+Hasil epoch menunjukkan tren yang baik dengan penurunan nilai loss dan root_mean_squared_error (RMSE) seiring bertambahnya epoch yang mengindikasikan model belajar dengan baik. Namun, val_loss dan val_root_mean_squared_error (val_RMSE) cenderung stabil setelah epoch ke-5, bahkan sedikit meningkat di epoch terakhir, menunjukkan potensi overfitting. Secara keseluruhan, model ini menunjukkan performa yang baik pada data pelatihan, tetapi perlu diwaspadai potensi overfitting pada data validasi.
+
 ## 🗳️5. Evaluation
 
-### Visualisasi Metrics Training
+Proses evaluasi dilakukan secara menyeluruh, dimulai dari analisis performa model selama pelatihan hingga pengujian sistem rekomendasi terhadap data nyata. Tujuan dari tahap ini adalah untuk memastikan bahwa model collaborative filtering tidak hanya bekerja baik secara teori, tetapi juga mampu memberikan rekomendasi yang relevan dan akurat kepada pengguna.
+
+### Evaluasi Performa Model (Training Metrics)
+
+Model dievaluasi menggunakan metrik Root Mean Squared Error (RMSE), yang digunakan untuk mengukur seberapa besar selisih antara prediksi model dengan data aktual. RMSE dihitung menggunakan rumus berikut:
+
+        RMSE = sqrt( (1/n) * Σ (y_i - ŷ_i)^2 )
 
 ![Model Metric](image/5.png)
+
+Nilai RMSE yang lebih rendah menunjukkan prediksi model yang lebih akurat. Berdasarkan grafik pelatihan, terlihat bahwa nilai RMSE pada data pelatihan dan pengujian awalnya cukup tinggi, namun keduanya mengalami penurunan signifikan hingga sekitar epoch ke-2. Setelah titik tersebut, nilai RMSE pada data pelatihan terus menurun, sementara RMSE pada data pengujian mulai stabil dan cenderung sedikit meningkat.
+
+Perbedaan nilai RMSE yang cukup besar antara data pelatihan dan pengujian setelah epoch ke-2 menunjukkan potensi overfitting, di mana model terlalu menyesuaikan diri dengan data pelatihan namun tidak mampu melakukan generalisasi dengan baik pada data baru. Untuk mengurangi risiko ini, dapat dipertimbangkan penerapan teknik regularisasi atau pengaturan parameter model lebih lanjut.
+
+### Recommendation Testing Collaborative Filtering
+
+Setelah model selesai dilatih, sistem diuji dengan memilih satu pengguna secara acak dari data ulasan (Reviews_df). Tujuan dari pengujian ini adalah untuk mensimulasikan bagaimana sistem memberikan rekomendasi wisata berdasarkan preferensi historis pengguna. Semua tempat yang telah dikunjungi oleh pengguna diidentifikasi terlebih dahulu agar tidak direkomendasikan ulang.
+
+Daftar destinasi yang belum pernah dikunjungi pengguna kemudian diproses dan dikonversi ke format numerik yang sesuai dengan input model. Bersamaan dengan encoding ID pengguna, seluruh pasangan user–tempat diprediksi menggunakan model collaborative filtering:
+
+        predicted_ratings = model.predict(user_place_array).flatten()
+
+Model memberikan skor prediksi terhadap setiap destinasi, lalu sistem mengurutkan hasil tersebut dan memilih 10 destinasi dengan skor tertinggi sebagai rekomendasi baru. Untuk membantu mengevaluasi relevansi, sistem juga menampilkan 5 tempat dengan rating tertinggi yang pernah dikunjungi sebelumnya oleh pengguna tersebut. Perbandingan ini bertujuan untuk melihat apakah rekomendasi yang diberikan sejalan dengan preferensi pengguna di masa lalu.
