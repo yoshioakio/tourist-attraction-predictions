@@ -481,6 +481,7 @@ Nilai RMSE yang lebih rendah menunjukkan prediksi model yang lebih akurat. Berda
 Perbedaan nilai RMSE yang cukup besar antara data pelatihan dan pengujian setelah epoch ke-2 menunjukkan potensi overfitting, di mana model terlalu menyesuaikan diri dengan data pelatihan namun tidak mampu melakukan generalisasi dengan baik pada data baru. Untuk mengurangi risiko ini, dapat dipertimbangkan penerapan teknik regularisasi atau pengaturan parameter model lebih lanjut.
 
 ![EValusi CF](image/7.png)
+
 Evaluasi model collaborative filtering ini menunjukkan kinerja yang rendah, dengan nilai precision@10 sebesar 0.0080 dan recall@10 sebesar 0.0283, mengindikasikan model kurang efektif dalam memberikan rekomendasi yang relevan. Precision mengukur proporsi item yang direkomendasikan yang benar-benar relevan, sementara recall mengukur proporsi item relevan yang berhasil direkomendasikan. Dengan nilai yang rendah, model ini perlu dioptimalkan lebih lanjut kedepannya.
 
 ## Referensi
