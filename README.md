@@ -175,7 +175,7 @@ Untuk kolom Destinations*df karena terdapat \_missing value\* pada kolom **Time_
 
 Selain itu diputuskan juga untuk menghapus beberapa kolom yang tidak relevan agar bisa lebih sesuai tujuan penelitian untuk tidak digunakan dalam analisis rekomendasi, dan penghapusan kolom ini bisa membuat model lebih optimal kedepannya.
 
-        Destinations_df.drop(['Time_Minutes', 'Coordinate', 'Lat', 'Long', 'Unnamed: 11', 'Unnamed: 12'], axis=1, inplace=True)
+        Destinations_df.drop(['Time_Minutes', 'Coordinate', 'Price', 'Lat', 'Long', 'Unnamed: 11', 'Unnamed: 12'], axis=1, inplace=True)
 
 ### 🔁 3. Pemeriksaan dan Penghapusan Duplikasi
 
@@ -211,30 +211,12 @@ Dictionary baru dibuat untuk menyederhanakan proses pemetaan dan pengelompokan d
             'category': tour_category
         })
 
-📌 Contoh Output:
-
-| id  | tour_name                        | category      |
-| --- | -------------------------------- | ------------- |
-| 1   | Monumen Nasional                 | Budaya        |
-| 2   | Kota Tua                         | Budaya        |
-| 3   | Dunia Fantasi                    | Taman Hiburan |
-| …   | …                                | …             |
-| 437 | Gereja Perawan Maria Tak Berdosa | Tempat Ibadah |
-
----
-
-## 📦 Modeling
-
-### Content-Based Filtering
-
-#### 1. Data Preparation
-
-Cross-Check Variabel
-
-Langkah awal adalah memastikan dataset yang digunakan telah bersih dan terstruktur. Berikut contoh sampling data untuk pengecekan:
+Kemudian Cross-Check Variabel
 
         data = tour_df
         data.sample(5)
+
+📌 Contoh Output:
 
 | id  | tour_name                            | category      |
 | --- | ------------------------------------ | ------------- |
@@ -246,11 +228,7 @@ Langkah awal adalah memastikan dataset yang digunakan telah bersih dan terstrukt
 
 Dari data ini terlihat bahwa fitur category akan menjadi dasar dari proses rekomendasi berbasis konten.
 
-#### 2. Modeling Content-Based Filtering
-
-Pada tahap ini, dilakukan pemodelan sistem rekomendasi menggunakan pendekatan Content-Based Filtering, yaitu dengan merekomendasikan item yang memiliki kemiripan konten (kategori) dengan item yang dipilih oleh pengguna.
-
-##### 🔧 a. TF-IDF Vectorization
+### 🔧 TF-IDF Vectorization
 
 Digunakan TfidfVectorizer dari scikit-learn untuk mengubah teks kategori menjadi vektor numerik.
 
@@ -267,20 +245,52 @@ Digunakan TfidfVectorizer dari scikit-learn untuk mengubah teks kategori menjadi
 Output:
 ['alam', 'bahari', 'budaya', 'cagar', 'hiburan', 'ibadah','perbelanjaan', 'pusat', 'taman', 'tempat']
 
-##### 🤝 b. Cosine Similarity
+Menjadi :
+
+        tfidf_matrix.todense()
+
+        pd.DataFrame(
+        tfidf_matrix.todense(),
+        columns=tf.get_feature_names_out(),
+        index=data.tour_name
+        ).sample(22, axis=1, replace=True).sample(10, axis=0)
+
+| tour_name               | taman  | hiburan | perbelanjaan | hiburan | taman  | cagar  | cagar  | bahari | ibadah | perbelanjaan | hiburan | bahari | alam   | taman  | pusat | perbelanjaan | tempat | budaya | cagar  | bahari |
+| ----------------------- | ------ | ------- | ------------ | ------- | ------ | ------ | ------ | ------ | ------ | ------------ | ------- | ------ | ------ | ------ | ----- | ------------ | ------ | ------ | ------ | ------ |
+| Kampung Pelangi         | 0.7071 | 0.7071  | 0.0          | 0.7071  | 0.7071 | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.7071  | 0.0    | 0.0    | 0.7071 | 0.0   | 0.0          | 0.0    | 0.0    | 0.0    | 0.0    |
+| Curug Bugbrug           | 0.0    | 0.0     | 0.0          | 0.0     | 0.0    | 0.7071 | 0.7071 | 0.0    | 0.0    | 0.0          | 0.0     | 0.0    | 0.7071 | 0.0    | 0.0   | 0.0          | 0.0    | 0.0    | 0.7071 | 0.0    |
+| Museum Gedung Sate      | 0.0    | 0.0     | 0.0          | 0.0     | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.0     | 0.0    | 0.0    | 0.0    | 0.0   | 0.0          | 0.0    | 1.0    | 0.0    | 0.0    |
+| Dunia Fantasi           | 0.7071 | 0.7071  | 0.0          | 0.7071  | 0.7071 | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.7071  | 0.0    | 0.0    | 0.7071 | 0.0   | 0.0          | 0.0    | 0.0    | 0.0    | 0.0    |
+| Bumi Perkemahan Cibubur | 0.7071 | 0.7071  | 0.0          | 0.7071  | 0.7071 | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.7071  | 0.0    | 0.0    | 0.7071 | 0.0   | 0.0          | 0.0    | 0.0    | 0.0    | 0.0    |
+| Kampoeng Kopi Banaran   | 0.7071 | 0.7071  | 0.0          | 0.7071  | 0.7071 | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.7071  | 0.0    | 0.0    | 0.7071 | 0.0   | 0.0          | 0.0    | 0.0    | 0.0    | 0.0    |
+| Curug Anom              | 0.0    | 0.0     | 0.0          | 0.0     | 0.0    | 0.7071 | 0.7071 | 0.0    | 0.0    | 0.0          | 0.0     | 0.0    | 0.7071 | 0.0    | 0.0   | 0.0          | 0.0    | 0.0    | 0.7071 | 0.0    |
+| Masjid Raya Bandung     | 0.0    | 0.0     | 0.0          | 0.0     | 0.0    | 0.0    | 0.0    | 0.0    | 0.7071 | 0.0          | 0.0     | 0.0    | 0.0    | 0.0    | 0.0   | 0.0          | 0.0    | 0.7071 | 0.0    | 0.0    |
+| Jogja Exotarium         | 0.7071 | 0.7071  | 0.0          | 0.7071  | 0.7071 | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.7071  | 0.0    | 0.0    | 0.7071 | 0.0   | 0.0          | 0.0    | 0.0    | 0.0    | 0.0    |
+| Patung Sura dan Buaya   | 0.0    | 0.0     | 0.0          | 0.0     | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    | 0.0          | 0.0     | 0.0    | 0.0    | 0.0    | 0.0   | 0.0          | 0.0    | 1.0    | 0.0    | 0.0    |
+
+TF-IDF digunakan karena mampu menangkap term significance dalam data kategori pendek.
+
+---
+
+## 📦 Modeling
+
+### Content-Based Filtering
+
+#### 1. Modeling Content-Based Filtering
+
+Pada tahap ini, dilakukan pemodelan sistem rekomendasi menggunakan pendekatan Content-Based Filtering, yaitu dengan merekomendasikan item yang memiliki kemiripan konten (kategori) dengan item yang dipilih oleh pengguna.
+
+##### 🤝 a. Cosine Similarity
 
 Setelah mendapatkan representasi vektor, langkah selanjutnya adalah menghitung tingkat kemiripan antar wisata menggunakan Cosine Similarity.
+
+Cosine Similarity efektif mengukur kemiripan antara vektor fitur tanpa terpengaruh oleh panjang teks.
 
         cosine_sim = cosine_similarity(tfidf_matrix)
         cosine_sim_df = pd.DataFrame(cosine_sim, index=data['tour_name'], columns=data['tour_name'])
 
 - Ukuran matriks kemiripan: (437, 437)
 - Nilai 1 menunjukkan wisata yang berada pada kategori yang sama.
-
-##### 📌 c. Alasan Menggunakan TF-IDF + Cosine Similarity
-
-- TF-IDF digunakan karena mampu menangkap term significance dalam data kategori pendek.
-- Cosine Similarity efektif mengukur kemiripan antara vektor fitur tanpa terpengaruh oleh panjang teks.
 
 #### 3. Implementasi Model Rekomendasi
 
@@ -427,6 +437,16 @@ Sehingga didapati :
 
 Hasil epoch menunjukkan tren yang baik dengan penurunan nilai loss dan root_mean_squared_error (RMSE) seiring bertambahnya epoch yang mengindikasikan model belajar dengan baik. Namun, val_loss dan val_root_mean_squared_error (val_RMSE) cenderung stabil setelah epoch ke-5, bahkan sedikit meningkat di epoch terakhir, menunjukkan potensi overfitting. Secara keseluruhan, model ini menunjukkan performa yang baik pada data pelatihan, tetapi perlu diwaspadai potensi overfitting pada data validasi.
 
+#### 🛠️ 5. Tourist Attraction Recommendation Function CF
+
+Setelah model selesai dilatih, sistem diuji dengan memilih satu pengguna secara acak dari data ulasan (Reviews_df). Tujuan dari pengujian ini adalah untuk mensimulasikan bagaimana sistem memberikan rekomendasi wisata berdasarkan preferensi historis pengguna. Semua tempat yang telah dikunjungi oleh pengguna diidentifikasi terlebih dahulu agar tidak direkomendasikan ulang.
+
+Daftar destinasi yang belum pernah dikunjungi pengguna kemudian diproses dan dikonversi ke format numerik yang sesuai dengan input model. Bersamaan dengan encoding ID pengguna, seluruh pasangan user–tempat diprediksi menggunakan model collaborative filtering:
+
+        predicted_ratings = model.predict(user_place_array).flatten()
+
+Model memberikan skor prediksi terhadap setiap destinasi, lalu sistem mengurutkan hasil tersebut dan memilih 10 destinasi dengan skor tertinggi sebagai rekomendasi baru. Untuk membantu mengevaluasi relevansi, sistem juga menampilkan 5 tempat dengan rating tertinggi yang pernah dikunjungi sebelumnya oleh pengguna tersebut. Perbandingan ini bertujuan untuk melihat apakah rekomendasi yang diberikan sejalan dengan preferensi pengguna di masa lalu.
+
 ### 📊 Perbandingan Pendekatan
 
 | Pendekatan              | Kelebihan                                                                  | Kekurangan                                                                                    |
@@ -438,29 +458,30 @@ Hasil epoch menunjukkan tren yang baik dengan penurunan nilai loss dan root_mean
 
 ## 🗳️5. Evaluation
 
-Proses evaluasi dilakukan secara menyeluruh, dimulai dari analisis performa model selama pelatihan hingga pengujian sistem rekomendasi terhadap data nyata. Tujuan dari tahap ini adalah untuk memastikan bahwa model collaborative filtering tidak hanya bekerja baik secara teori, tetapi juga mampu memberikan rekomendasi yang relevan dan akurat kepada pengguna.
+Proses evaluasi dilakukan secara menyeluruh, dimulai dari analisis performa model selama pelatihan hingga pengujian sistem rekomendasi terhadap data nyata. Tujuan dari tahap ini adalah untuk memastikan bahwa model content based filtering dan collaborative filtering tidak hanya bekerja baik secara teori, tetapi juga mampu memberikan rekomendasi yang relevan dan akurat kepada pengguna.
 
-### Evaluasi Performa Model (Training Metrics)
+### Evaluasi Performa Model Content Based Filtering
+
+Pada tahap ini model CBF di evaluasi menggunakan Precision@k, Recall@k, untuk melihat keakuartan dan evalusi model dalam melakukan prediksi
+
+![Evalausi CBF](image/5.png)
+
+Evaluasi model content-based filtering untuk rekomendasi berdasarkan 'Rabbit Town' menunjukkan presisi sempurna (1.00) pada 5 rekomendasi teratas, namun recall-nya 5.00, yang mengindikasikan model ini mungkin merekomendasikan item yang sangat relevan tetapi tidak mencakup semua item relevan yang mungkin ada.
+
+### Evaluasi Performa Model Collaborative Filtering
 
 Model dievaluasi menggunakan metrik Root Mean Squared Error (RMSE), yang digunakan untuk mengukur seberapa besar selisih antara prediksi model dengan data aktual. RMSE dihitung menggunakan rumus berikut:
 
         RMSE = sqrt( (1/n) * Σ (y_i - ŷ_i)^2 )
 
-![Model Metric](image/5.png)
+![Model Metric](image/6.png)
 
 Nilai RMSE yang lebih rendah menunjukkan prediksi model yang lebih akurat. Berdasarkan grafik pelatihan, terlihat bahwa nilai RMSE pada data pelatihan dan pengujian awalnya cukup tinggi, namun keduanya mengalami penurunan signifikan hingga sekitar epoch ke-2. Setelah titik tersebut, nilai RMSE pada data pelatihan terus menurun, sementara RMSE pada data pengujian mulai stabil dan cenderung sedikit meningkat.
 
 Perbedaan nilai RMSE yang cukup besar antara data pelatihan dan pengujian setelah epoch ke-2 menunjukkan potensi overfitting, di mana model terlalu menyesuaikan diri dengan data pelatihan namun tidak mampu melakukan generalisasi dengan baik pada data baru. Untuk mengurangi risiko ini, dapat dipertimbangkan penerapan teknik regularisasi atau pengaturan parameter model lebih lanjut.
 
-### Recommendation Testing Collaborative Filtering
-
-Setelah model selesai dilatih, sistem diuji dengan memilih satu pengguna secara acak dari data ulasan (Reviews_df). Tujuan dari pengujian ini adalah untuk mensimulasikan bagaimana sistem memberikan rekomendasi wisata berdasarkan preferensi historis pengguna. Semua tempat yang telah dikunjungi oleh pengguna diidentifikasi terlebih dahulu agar tidak direkomendasikan ulang.
-
-Daftar destinasi yang belum pernah dikunjungi pengguna kemudian diproses dan dikonversi ke format numerik yang sesuai dengan input model. Bersamaan dengan encoding ID pengguna, seluruh pasangan user–tempat diprediksi menggunakan model collaborative filtering:
-
-        predicted_ratings = model.predict(user_place_array).flatten()
-
-Model memberikan skor prediksi terhadap setiap destinasi, lalu sistem mengurutkan hasil tersebut dan memilih 10 destinasi dengan skor tertinggi sebagai rekomendasi baru. Untuk membantu mengevaluasi relevansi, sistem juga menampilkan 5 tempat dengan rating tertinggi yang pernah dikunjungi sebelumnya oleh pengguna tersebut. Perbandingan ini bertujuan untuk melihat apakah rekomendasi yang diberikan sejalan dengan preferensi pengguna di masa lalu.
+![EValusi CF](image/7.png)
+Evaluasi model collaborative filtering ini menunjukkan kinerja yang rendah, dengan nilai precision@10 sebesar 0.0080 dan recall@10 sebesar 0.0283, mengindikasikan model kurang efektif dalam memberikan rekomendasi yang relevan. Precision mengukur proporsi item yang direkomendasikan yang benar-benar relevan, sementara recall mengukur proporsi item relevan yang berhasil direkomendasikan. Dengan nilai yang rendah, model ini perlu dioptimalkan lebih lanjut kedepannya.
 
 ## Referensi
 
