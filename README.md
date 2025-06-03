@@ -127,7 +127,7 @@ Distribusi rating pengguna cenderung tinggi (dominan rating 3–4), menunjukkan 
 
 Tahapan ini bertujuan untuk mempersiapkan data mentah agar siap digunakan dalam proses analisis dan pemodelan rekomendasi. Teknik-teknik yang diterapkan dijelaskan secara berurutan sesuai praktik di notebook.
 
-### 📌 1. Pemeriksaan Jumlah Data Wisata
+### 📌 Pemeriksaan Jumlah Data Wisata
 
 Langkah pertama adalah memastikan jumlah data tempat wisata yang tersedia dalam dataset:
 
@@ -137,7 +137,7 @@ Output: 437
 
 📍 Kesimpulan: Dataset Destinations_df berisi 437 tempat wisata.
 
-### 🚨 2. Pemeriksaan Missing Value
+### 🚨 Pemeriksaan Missing Value
 
 Diperiksa jumlah nilai kosong (missing) di kedua dataset:
 
@@ -177,7 +177,7 @@ Selain itu diputuskan juga untuk menghapus beberapa kolom yang tidak relevan aga
 
         Destinations_df.drop(['Time_Minutes', 'Coordinate', 'Price', 'Lat', 'Long', 'Unnamed: 11', 'Unnamed: 12'], axis=1, inplace=True)
 
-### 🔁 3. Pemeriksaan dan Penghapusan Duplikasi
+### 🔁 Pemeriksaan dan Penghapusan Duplikasi
 
 Data duplikat diperiksa dan dihapus untuk memastikan tidak terjadi bias atau redundansi.
 
@@ -191,7 +191,7 @@ Data duplikat diperiksa dan dihapus untuk memastikan tidak terjadi bias atau red
 
         Reviews_df.drop_duplicates(inplace=True)
 
-### 🔄 4. Konversi Series Menjadi List
+### 🔄 Konversi Series Menjadi List
 
 Langkah ini bertujuan untuk mempermudah manipulasi data dan pembuatan struktur baru.
 
@@ -201,7 +201,7 @@ Langkah ini bertujuan untuk mempermudah manipulasi data dan pembuatan struktur b
 
 📍 Jumlah item pada masing-masing list: 437
 
-### 🧱 5. Membuat Dictionary Dataset
+### 🧱 Membuat Dictionary Dataset
 
 Dictionary baru dibuat untuk menyederhanakan proses pemetaan dan pengelompokan data wisata berdasarkan ID, nama, dan kategori:
 
