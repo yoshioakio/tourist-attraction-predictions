@@ -277,17 +277,12 @@ def tour_recommendation(place_name, top_k=5, similarity_data=cosine_sim_df, item
 tour_recommendation("Rabbit Town")
 
 """# **🤝 Model Development dengan Collaborative Filtering**
-
-## Data loading
-
-Memanggil dataset kemabali untuk dilakukan analisa
 """
 
 user = Reviews_df
 user
 
-"""## Data Preparation
-
+"""
 Mengubah User_Id menjadi list tanpa nilai yang sama
 """
 

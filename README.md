@@ -305,11 +305,10 @@ Pengguna cukup memasukkan nama tempat wisata yang pernah dikunjungi. Nama ini ak
             print(f"Tempat wisata dengan nama '{place_name}' tidak ditemukan.")
             return pd.DataFrame()
 
-##### ⚙️ 2. Proses: Mencari Kemiripan dan Evaluasi
+##### ⚙️ 2. Proses: Mencari Kemiripan
 
 - Hitung kemiripan antara tempat input dan semua tempat lain menggunakan Cosine Similarity.
 - Lalu ambil sejumlah top_k tempat paling mirip (kecuali tempat input).
-- Evaluasi kesamaan kategori
 
         sim_scores = list(enumerate(similarity_data.iloc[place_index[0]]))
         sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:top_k + 1]
@@ -317,20 +316,6 @@ Pengguna cukup memasukkan nama tempat wisata yang pernah dikunjungi. Nama ini ak
 
         recommendations = items.iloc[place_indices].copy()
         recommendations['similarity_score'] = [i[1] for i in sim_scores]
-
-**Evaluasi kesamaan kategori**
-
-        query_categories = set(data.loc[place_index[0], 'category'].lower().replace(", ", ",").split(","))
-        total_overlap = 0
-        category_counts = []
-
-        for _, row in recommendations.iterrows():
-            rec_categories = set(row['category'].lower().replace(", ", ",").split(","))
-            overlap = query_categories.intersection(rec_categories)
-            total_overlap += len(overlap)
-            category_counts.append(len(rec_categories))
-
-        precision_at_k = total_overlap / sum(category_counts) if category_counts else 0
 
 ##### 📤 3. Output: Daftar Rekomendasi Tempat Wisata
 
@@ -357,25 +342,9 @@ Rekomendasi Tempat Wisata Lainnya 5:
 
 Collaborative Filtering memanfaatkan interaksi pengguna (review/rating) terhadap tempat wisata untuk memberikan rekomendasi yang personal. Sistem ini dirancang untuk menangkap pola preferensi pengguna dan menyarankan tempat baru berdasarkan user-user serupa.
 
-#### 📦 1. Data Loading
-
-Langkah awal adalah memuat dataset Reviews_df, yaitu kumpulan ulasan pengguna terhadap berbagai tempat wisata. Data ini berisi User_Id, Place_Id, dan Place_Ratings.
-
-        user = Reviews_df
-        user
-
-| User_Id | Place_Id | Place_Ratings |
-| ------- | -------- | ------------- |
-| 1       | 179      | 3             |
-| 1       | 344      | 2             |
-| 1       | 5        | 5             |
-| ...     | ...      | ...           |
-
-#### 🧹 2. Data Preparation
+#### 🧹 1. Data Preparation
 
 Tahap ini bertujuan untuk mempersiapkan data agar bisa digunakan dalam model, terutama melakukan encoding (mengubah ID ke bentuk numerik).
-
-Langkah-langkah:
 
 1. Ambil daftar unik User_Id & Place_Id
    -> Menghindari duplikasi dan memudahkan encoding.
@@ -386,16 +355,7 @@ Langkah-langkah:
 3. Mapping ke DataFrame
    -> Menambahkan kolom USER dan TOUR sebagai hasil encoding.
 
-📋 Output (Setelah Mapping):
-
-| User_Id | Place_Id | Place_Ratings | USER | TOUR |
-| ------- | -------- | ------------- | ---- | ---- |
-| 1       | 179      | 3             | 0    | 0    |
-| 1       | 344      | 2             | 0    | 1    |
-| 1       | 5        | 5             | 0    | 2    |
-| ...     | ...      | ...           | ...  | ...  |
-
-#### 🛠️ 3. Training and Validation Process
+#### 🛠️ 2. Training and Validation Process
 
 Setelah data siap, langkah berikutnya adalah melatih model menggunakan data tersebut. Proses training meliputi beberapa tahap:
 
@@ -403,7 +363,7 @@ Setelah data siap, langkah berikutnya adalah melatih model menggunakan data ters
 - Normalisasi rating agar nilai rating berada dalam skala 0 sampai 1, memudahkan proses pembelajaran model.
 - Membentuk input x berupa pasangan (USER, TOUR) dan target y berupa rating yang sudah dinormalisasi.
 
-#### 🧠 4. Building Neural Collaborative Filtering Model
+#### 🧠 3. Building Neural Collaborative Filtering Model
 
 Model Neural Collaborative Filtering (NCF) ini menggunakan pendekatan deep learning dengan embedding layers serta dot product untuk memprediksi rating wisata berdasarkan interaksi antara user dan tempat wisata (tour).
 
@@ -446,6 +406,10 @@ Daftar destinasi yang belum pernah dikunjungi pengguna kemudian diproses dan dik
         predicted_ratings = model.predict(user_place_array).flatten()
 
 Model memberikan skor prediksi terhadap setiap destinasi, lalu sistem mengurutkan hasil tersebut dan memilih 10 destinasi dengan skor tertinggi sebagai rekomendasi baru. Untuk membantu mengevaluasi relevansi, sistem juga menampilkan 5 tempat dengan rating tertinggi yang pernah dikunjungi sebelumnya oleh pengguna tersebut. Perbandingan ini bertujuan untuk melihat apakah rekomendasi yang diberikan sejalan dengan preferensi pengguna di masa lalu.
+
+##### Output top-n recommendation Collaborative Filtering
+
+![Output CF](image/8.png)
 
 ### 📊 Perbandingan Pendekatan
 
