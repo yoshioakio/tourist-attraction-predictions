@@ -228,6 +228,19 @@ Kemudian Cross-Check Variabel
 
 Dari data ini terlihat bahwa fitur category akan menjadi dasar dari proses rekomendasi berbasis konten.
 
+### 🧹 Encoding Fitur (For modelling collaborative filtering)
+
+Tahap ini bertujuan untuk mempersiapkan data agar bisa digunakan dalam model, terutama melakukan encoding (mengubah ID ke bentuk numerik).
+
+1. Ambil daftar unik User_Id & Place_Id
+   -> Menghindari duplikasi dan memudahkan encoding.
+
+2. Encoding User_Id dan Place_Id
+   -> Mengubah ID asli menjadi angka unik dari 0 hingga N.
+
+3. Mapping ke DataFrame
+   -> Menambahkan kolom USER dan TOUR sebagai hasil encoding.
+
 ### 🔧 TF-IDF Vectorization
 
 Digunakan TfidfVectorizer dari scikit-learn untuk mengubah teks kategori menjadi vektor numerik.
@@ -342,20 +355,7 @@ Rekomendasi Tempat Wisata Lainnya 5:
 
 Collaborative Filtering memanfaatkan interaksi pengguna (review/rating) terhadap tempat wisata untuk memberikan rekomendasi yang personal. Sistem ini dirancang untuk menangkap pola preferensi pengguna dan menyarankan tempat baru berdasarkan user-user serupa.
 
-#### 🧹 1. Data Preparation
-
-Tahap ini bertujuan untuk mempersiapkan data agar bisa digunakan dalam model, terutama melakukan encoding (mengubah ID ke bentuk numerik).
-
-1. Ambil daftar unik User_Id & Place_Id
-   -> Menghindari duplikasi dan memudahkan encoding.
-
-2. Encoding User_Id dan Place_Id
-   -> Mengubah ID asli menjadi angka unik dari 0 hingga N.
-
-3. Mapping ke DataFrame
-   -> Menambahkan kolom USER dan TOUR sebagai hasil encoding.
-
-#### 🛠️ 2. Training and Validation Process
+#### 🛠️ 1. Training and Validation Process
 
 Setelah data siap, langkah berikutnya adalah melatih model menggunakan data tersebut. Proses training meliputi beberapa tahap:
 
@@ -363,7 +363,7 @@ Setelah data siap, langkah berikutnya adalah melatih model menggunakan data ters
 - Normalisasi rating agar nilai rating berada dalam skala 0 sampai 1, memudahkan proses pembelajaran model.
 - Membentuk input x berupa pasangan (USER, TOUR) dan target y berupa rating yang sudah dinormalisasi.
 
-#### 🧠 3. Building Neural Collaborative Filtering Model
+#### 🧠 2. Building Neural Collaborative Filtering Model
 
 Model Neural Collaborative Filtering (NCF) ini menggunakan pendekatan deep learning dengan embedding layers serta dot product untuk memprediksi rating wisata berdasarkan interaksi antara user dan tempat wisata (tour).
 
@@ -397,7 +397,7 @@ Sehingga didapati :
 
 Hasil epoch menunjukkan tren yang baik dengan penurunan nilai loss dan root_mean_squared_error (RMSE) seiring bertambahnya epoch yang mengindikasikan model belajar dengan baik. Namun, val_loss dan val_root_mean_squared_error (val_RMSE) cenderung stabil setelah epoch ke-5, bahkan sedikit meningkat di epoch terakhir, menunjukkan potensi overfitting. Secara keseluruhan, model ini menunjukkan performa yang baik pada data pelatihan, tetapi perlu diwaspadai potensi overfitting pada data validasi.
 
-#### 🛠️ 5. Tourist Attraction Recommendation Function CF
+#### 🛠️ 3. Tourist Attraction Recommendation Function CF
 
 Setelah model selesai dilatih, sistem diuji dengan memilih satu pengguna secara acak dari data ulasan (Reviews_df). Tujuan dari pengujian ini adalah untuk mensimulasikan bagaimana sistem memberikan rekomendasi wisata berdasarkan preferensi historis pengguna. Semua tempat yang telah dikunjungi oleh pengguna diidentifikasi terlebih dahulu agar tidak direkomendasikan ulang.
 
