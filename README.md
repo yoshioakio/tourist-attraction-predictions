@@ -103,7 +103,7 @@ Berisi 10.000 baris dan 3 kolom.
 
 ![Destinations Dataset](image/9.png)
 
-Bisa dilihat, bahwa terdapat \_missing value\* pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**
+Bisa dilihat, bahwa terdapat _missing value_ pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**
 
 ![Ratings Dataset](image/10.png)
 
