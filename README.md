@@ -186,7 +186,7 @@ Diperiksa jumlah nilai kosong (missing) di kedua dataset:
 | Place_Id      | 0                   |
 | Place_Ratings | 0                   |
 
-Untuk kolom Destinations*df karena terdapat \_missing value\* pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**, maka diputuskan untuk menghapus/menghilangkan kolom yang ada \_missing value* tersebut, karena terlalu banyak missing dan tidak bisa diimputasi secara akurat, atau tidak terlalu berdampak pada rekomendasi berbasis kategori.
+Untuk kolom Destinations*df karena terdapat *missing value* pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**, maka diputuskan untuk menghapus/menghilangkan kolom yang ada \_missing value* tersebut, karena terlalu banyak missing dan tidak bisa diimputasi secara akurat, atau tidak terlalu berdampak pada rekomendasi berbasis kategori.
 
 Selain itu diputuskan juga untuk menghapus beberapa kolom yang tidak relevan agar bisa lebih sesuai tujuan penelitian untuk tidak digunakan dalam analisis rekomendasi, dan penghapusan kolom ini bisa membuat model lebih optimal kedepannya.
 
