@@ -152,7 +152,7 @@ Output: 437
 
 📍 Kesimpulan: Dataset Destinations_df berisi 437 tempat wisata.
 
-### 🚨 Pemeriksaan Missing Value
+### 🚨 Penanganan Missing Value
 
 Diperiksa jumlah nilai kosong (missing) di kedua dataset:
 
@@ -192,7 +192,7 @@ Selain itu diputuskan juga untuk menghapus beberapa kolom yang tidak relevan aga
 
         Destinations_df.drop(['Time_Minutes', 'Coordinate', 'Price', 'Lat', 'Long', 'Unnamed: 11', 'Unnamed: 12'], axis=1, inplace=True)
 
-### 🔁 Pemeriksaan dan Penghapusan Duplikasi
+### 🔁 Penanganan dan Penghapusan Duplikasi
 
 Data duplikat diperiksa dan dihapus untuk memastikan tidak terjadi bias atau redundansi.
 
