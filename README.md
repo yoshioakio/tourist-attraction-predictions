@@ -69,7 +69,7 @@ Dataset ini terdiri dari dua file utama:
         tourism_with_id.csv: berisi informasi detail mengenai tempat wisata.
         tourism_rating.csv: berisi data rating dari pengguna terhadap tempat wisata.
 
-### 📁 Struktur Dataset
+### 📁 Informasi Kegunaan Dataset
 
 #### 🏞️ Destinations Dataset (tourism_with_id.csv)
 
@@ -99,6 +99,16 @@ Berisi 10.000 baris dan 3 kolom.
 | `Place_Id`      | ID tempat wisata (relasi dengan `tourism_with_id.csv`) |
 | `Place_Ratings` | Skor rating dari pengguna (1–5)                        |
 
+### 🗳️Struktur Dataset
+
+![Destinations Dataset](image/9.png)
+
+Bisa dilihat, bahwa terdapat \_missing value\* pada kolom **Time_Minutes = 232**, dan **Unnamed: 11 = 437**
+
+![Ratings Dataset](image/10.png)
+
+Pada bagian Reviews_df, dilihat bahwa dataset ini memiliki struktur data yang bagus dan relavan untuk dilakukan analisa
+
 ### 📌 Ringkasan Statistik Awal
 
 - Jumlah tempat wisata: 437
@@ -106,6 +116,11 @@ Berisi 10.000 baris dan 3 kolom.
 - Jumlah kategori wisata: 6 kategori
 - Jumlah user yang melakukan review: 300
 - Jumlah data rating pengguna: 10.000
+
+### Pemeriksaan Duplikasi
+
+- Jumlah data duplikat pada destinasi: 0
+- Jumlah data duplikat pada rewiew: 79
 
 ### 📈 Visualisasi Awal (EDA)
 
@@ -240,6 +255,18 @@ Tahap ini bertujuan untuk mempersiapkan data agar bisa digunakan dalam model, te
 
 3. Mapping ke DataFrame
    -> Menambahkan kolom USER dan TOUR sebagai hasil encoding.
+
+### 🪄 Normalisasi nilai Place_Ratings (For modelling collaborative filtering)
+
+        min_rating = Reviews_df['Place_Ratings'].min()
+        max_rating = Reviews_df['Place_Ratings'].max()
+        y = Reviews_df['Place_Ratings'].apply(lambda x: (x - min_rating) / (max_rating - min_rating)).values
+
+Kode diatas mengubah rating ke skala 0-1, dengan menggunakan penerapan teknik min - max
+
+### 📍 splitting data (For modelling collaborative filtering)
+
+Pada bagian pembagian data, data dibagi menjadi **80% data train** dan **20% data validasi**. Hal ini berguna agar performa model dapat dengan baik memahami kondisi dataset.
 
 ### 🔧 TF-IDF Vectorization
 
